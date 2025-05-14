@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { FileUploadComponent, ConfigurationComponent, TabsComponent, VisualizationComponent } from './components';
-import { processCsvData, analyzeDataQuality, inferContentType } from './utils';
+import { processCsvData, analyzeDataQuality, inferContentType, sanitizeCSVCell } from './utils';
 
 const BrandTrafficAnalyzer = () => {
   const [file, setFile] = useState(null);
@@ -27,7 +27,7 @@ const BrandTrafficAnalyzer = () => {
     const saved = localStorage.getItem('brandTrafficConfig');
     if (saved) {
       const { brandTerms, useCustomRegex, customRegex, caseSensitive, detectLanguageCodes } = JSON.parse(saved);
-      setBrandTerms(brandTerms || ',');
+      setBrandTerms(brandTerms || '');
       setUseCustomRegex(useCustomRegex || false);
       setCustomRegex(customRegex || '');
       setCaseSensitive(caseSensitive || false);
@@ -110,8 +110,12 @@ const BrandTrafficAnalyzer = () => {
     if (!results?.pathData) return setError('No results to export');
     setExportLoading(true);
     const csv = [
-      ['URL Path', 'Queries', 'Branded %', 'Non-Branded %', 'Content Type'].join(','),
-      ...results.pathData.map((row) => [row.name, row.sortableTotal, row.branded, row.nonBranded, inferContentType(row.name) || 'Unknown'].map((field) => `"${field}"`).join(',')),
+      ['URL Path', 'Queries', 'Branded %', 'Non-Branded %', 'Content Type'].map(header => sanitizeCSVCell(header)).join(','),
+      ...results.pathData.map((row) => 
+        [row.name, row.sortableTotal, row.branded, row.nonBranded, inferContentType(row.name) || 'Unknown']
+        .map(field => sanitizeCSVCell(String(field)))
+        .map((field) => `"${field}"`).join(',')
+      ),
     ].join('\n');
     await downloadCSV(csv, 'url_analysis_data.csv');
     setExportLoading(false);
@@ -131,13 +135,19 @@ const BrandTrafficAnalyzer = () => {
       dataToExport = [...(results.branded?.samples || []), ...(results.nonBranded?.samples || [])];
     }
     const csv = [
-      ['Query', 'Clicks', 'Impressions', 'CTR', 'Avg Position', 'Content Types', 'Landing Page', 'Language'].join(','),
+      ['Query', 'Clicks', 'Impressions', 'CTR', 'Avg Position', 'Content Types', 'Landing Page', 'Language'].map(header => sanitizeCSVCell(header)).join(','),
       ...dataToExport.map((row) => [
-        row.query || '', row.clicks || 0, row.impressions || 0, (row.ctr * 100).toFixed(1) || 0, row.avgPosition?.toFixed(1) || 0,
+        row.query || '',
+        row.clicks || 0,
+        row.impressions || 0,
+        (row.ctr * 100).toFixed(1) || 0,
+        row.avgPosition?.toFixed(1) || 0,
         (Array.isArray(row.contentTypes) ? row.contentTypes.join(';') : row.contentTypes) || 'Unknown',
         (row.urls && row.urls.length > 0 ? row.urls[0].url : '') || '',
         (row.urls && row.urls.length > 0 ? row.urls[0].language : 'en') || 'en',
-      ].map((field) => `"${field}"`).join(',')),
+      ]
+      .map(field => sanitizeCSVCell(String(field)))
+      .map((field) => `"${field}"`).join(',')),
     ].join('\n');
     await downloadCSV(csv, filename);
     setExportLoading(false);
@@ -147,8 +157,12 @@ const BrandTrafficAnalyzer = () => {
     if (!results?.languageData) return setError('No results to export');
     setExportLoading(true);
     const csv = [
-      ['Language', 'Code', 'Total Queries', 'Clicks', 'Branded %', 'Non-Branded %'].join(','),
-      ...results.languageData.map((row) => [row.language, row.code, row.sortableTotal, row.clicks, row.branded, row.nonBranded].map((field) => `"${field}"`).join(',')),
+      ['Language', 'Code', 'Total Queries', 'Clicks', 'Branded %', 'Non-Branded %'].map(header => sanitizeCSVCell(header)).join(','),
+      ...results.languageData.map((row) => 
+        [row.language, row.code, row.sortableTotal, row.clicks, row.branded, row.nonBranded]
+        .map(field => sanitizeCSVCell(String(field)))
+        .map((field) => `"${field}"`).join(',')
+      ),
     ].join('\n');
     await downloadCSV(csv, 'language_analysis_data.csv');
     setExportLoading(false);
@@ -158,7 +172,7 @@ const BrandTrafficAnalyzer = () => {
     if (!results) return setError('No results to export');
     setExportLoading(true);
     const csv = [
-      ['Insight Type', 'Description', 'Value'].join(','),
+      ['Insight Type', 'Description', 'Value'].map(header => sanitizeCSVCell(header)).join(','),
       ...[
         ['Branded CTR', 'Branded traffic CTR', ((results.branded?.metrics?.ctr || 0) * 100).toFixed(1) + '%'],
         ['Non-Branded CTR', 'Non-Branded traffic CTR', ((results.nonBranded?.metrics?.ctr || 0) * 100).toFixed(1) + '%'],
@@ -166,7 +180,9 @@ const BrandTrafficAnalyzer = () => {
         ['Non-Branded Avg Position', 'Average position for non-branded terms', (results.nonBranded?.metrics?.avgPosition || 0).toFixed(1)],
         ['Branded Percentage', 'Percentage of branded traffic', (results.summary?.brandedPercentage || 0).toFixed(1) + '%'],
         ['Non-Branded Percentage', 'Percentage of non-branded traffic', (results.summary?.nonBrandedPercentage || 0).toFixed(1) + '%'],
-      ].map((row) => row.map((field) => `"${field}"`).join(',')),
+      ]
+      .map(row => row.map(field => sanitizeCSVCell(String(field))))
+      .map(row => row.map(field => `"${field}"`).join(',')),
     ].join('\n');
     await downloadCSV(csv, 'insights_data.csv');
     setExportLoading(false);

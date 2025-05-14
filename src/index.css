@@ -10,6 +10,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  width: 100%; /* Ensure root takes full width */
+}
+
 a {
   font-weight: 500;
   color: #646cff;

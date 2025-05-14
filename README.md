@@ -22,8 +22,12 @@ Web application for analyzing search traffic data with a focus on differentiatin
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/dexter480/brand-traffic-analyzer.git
+   git clone https://github.com/dexter480/brand-traffic-analyzer
    cd brand-traffic-analyzer
+   npm install
+   npm run dev
+
+   
 
 The application will be available at [https://vesivanov.com/brand-nonbrand-analyzer/](https://vesivanov.com/brand-nonbrand-analyzer/).
 

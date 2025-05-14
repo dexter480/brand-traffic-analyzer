@@ -136,13 +136,39 @@ const processCsvResults = (data, config) => {
     const queryLower = caseSensitive ? query : query.toLowerCase();
     if (useCustomRegex && customRegex) {
       try {
-        return new RegExp(customRegex, caseSensitive ? '' : 'i').test(query);
+        const regex = new RegExp(customRegex, caseSensitive ? '' : 'i');
+        
+        // Use a "maximum steps" approach for ReDoS protection
+        const maxSteps = 1000;
+        let steps = 0;
+        const safeRegexTest = (regexPattern, str) => {
+          // Ensure regexPattern is a RegExp object if it's passed as a string
+          const currentRegex = (typeof regexPattern === 'string') 
+            ? new RegExp(regexPattern, caseSensitive ? '' : 'i') 
+            : regexPattern;
+
+          const chunkSize = 100;
+          for (let i = 0; i < str.length; i += chunkSize) {
+            const chunk = str.substring(i, Math.min(i + chunkSize, str.length)); // Use substring and Math.min for safety
+            currentRegex.test(chunk); // Test on chunk, primarily to increment steps
+            steps++;
+            if (steps > maxSteps) {
+              console.warn('Regex execution stopped: Exceeded maximum steps.');
+              throw new Error('Regex timeout - pattern potentially too complex or string too long against pattern');
+            }
+          }
+          // Final test on the whole string, only if steps not exceeded
+          return currentRegex.test(str);
+        };
+        
+        return safeRegexTest(regex, query);
       } catch (e) {
-        console.error('Invalid regex:', e);
-        return false;
+        console.error('Regex error or timeout:', e.message);
+        return false; // Treat regex errors (including timeout) as not branded for safety
       }
     }
-    return terms.some((term) => queryLower.includes(term));
+    // Fallback to simple term checking if not using custom regex or if customRegex is empty
+    return terms.some((term) => term && queryLower.includes(term)); // ensure term is not empty
   };
 
   const languageCodes = new Set([
@@ -261,3 +287,49 @@ export const sampleLanguageData = [
   { language: 'English', code: 'en', total: 500, clicks: 2000, branded: 60, nonBranded: 40, sortableTotal: 500 },
 ];
 export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF7300'];
+
+export const sanitize = (content) => {
+  if (typeof content === undefined || content === null) return '';
+  if (typeof content !== 'string') return String(content);
+  return String(content)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
+export const sanitizeCSVCell = (content) => {
+  if (typeof content !== 'string') return content;
+  // Prevent CSV formula injection attacks
+  if (content.startsWith('=') || content.startsWith('+') || 
+      content.startsWith('-') || content.startsWith('@')) {
+    return `\'${content}`; // Prefix with apostrophe
+  }
+  return content;
+};
+
+export const validateCSVContent = (data) => {
+  // Check for suspicious content
+  const suspiciousPatterns = [
+    /<script/i, /<iframe/i, /javascript:/i, /data:/i, /vbscript:/i
+  ];
+  
+  for (const row of data) {
+    for (const key in row) {
+      // Ensure row.hasOwnProperty(key) if iterating over object properties directly from an unknown source is a concern,
+      // though PapaParse results are usually structured arrays of objects.
+      const value = String(row[key] || '');
+      for (const pattern of suspiciousPatterns) {
+        if (pattern.test(value)) {
+          return {
+            valid: false,
+            message: `Suspicious content detected in CSV file (e.g., in row with data like: ${String(row[key]).substring(0,50)}...).`
+          };
+        }
+      }
+    }
+  }
+  
+  return { valid: true };
+};
