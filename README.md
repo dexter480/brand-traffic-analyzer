@@ -1,12 +1,38 @@
-# React + Vite
+# Brand Traffic Analyzer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A powerful web application for analyzing search traffic data with a focus on differentiating between branded and non-branded traffic. This tool helps you gain actionable insights from your search console data.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Traffic Segmentation**: Automatically distinguish between branded and non-branded search traffic
+- **Multi-dimensional Analysis**: Examine traffic patterns by URL path, language, query types
+- **Data Visualization**: Interactive charts and graphs for better data comprehension
+- **Quality Assessment**: Check data completeness, consistency, and detect outliers
+- **Actionable Insights**: Get recommendations based on your traffic patterns
+- **Export Options**: Download analysis as CSV or PDF for reporting
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v16.0.0 or later)
+- npm or yarn
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/brand-traffic-analyzer.git
+cd brand-traffic-analyzer
+
+# Install dependencies
+npm install
+# or
+yarn
+
+# Start development server
+npm run dev
+# or
+yarn dev
+
+The application will be also available at: https://vesivanov.com/brand-nonbrand-analyzer/
