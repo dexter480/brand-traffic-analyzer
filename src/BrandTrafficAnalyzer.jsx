@@ -8,7 +8,7 @@ const BrandTrafficAnalyzer = () => {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('config');
-  const [brandTerms, setBrandTerms] = useState('pipedrive, pipe drive');
+  const [brandTerms, setBrandTerms] = useState('');
   const [useCustomRegex, setUseCustomRegex] = useState(false);
   const [customRegex, setCustomRegex] = useState('');
   const [caseSensitive, setCaseSensitive] = useState(false);
