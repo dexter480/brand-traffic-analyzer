@@ -115,7 +115,7 @@ export const ConfigurationComponent = ({
           value={brandTerms}
           onChange={(e) => setBrandTerms(e.target.value)}
           className="w-full p-2 border rounded"
-          placeholder="e.g., pipedrive, pipe drive"
+          placeholder="add your brand name here"
         />
       </div>
       <label className="flex items-center mb-2">
