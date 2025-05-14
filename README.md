@@ -29,7 +29,7 @@ Web application for analyzing search traffic data with a focus on differentiatin
 
    
 
-The application will be available at [https://vesivanov.com/brand-nonbrand-analyzer/](https://vesivanov.com/brand-nonbrand-analyzer/).
+The application will be available at [https://vesivanov.com/brand-traffic-analyzer/](https://vesivanov.com/brand-traffic-analyzer/).
 
 ## Usage
 
