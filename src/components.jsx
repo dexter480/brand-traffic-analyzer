@@ -1232,7 +1232,7 @@ export const VisualizationComponent = React.memo(({
       const topQuery = [...(results.branded?.samples || []), ...(results.nonBranded?.samples || [])]
         .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0];
       if (topQuery) {
-        insights.push(`Top performing query "${topQuery.query || 'pipedrive pricing'}" with ${topQuery.clicks || 942} clicks may benefit from dedicated content, such as a landing page or blog post, to capitalize on its popularity.`);
+        insights.push(`Top performing query "${topQuery.query || 'pricing'}" with ${topQuery.clicks || 942} clicks may benefit from dedicated content, such as a landing page or blog post, to capitalize on its popularity.`);
       }
 
       // 4. Conversion Potential Insight
