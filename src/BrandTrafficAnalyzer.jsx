@@ -27,7 +27,7 @@ const BrandTrafficAnalyzer = () => {
     const saved = localStorage.getItem('brandTrafficConfig');
     if (saved) {
       const { brandTerms, useCustomRegex, customRegex, caseSensitive, detectLanguageCodes } = JSON.parse(saved);
-      setBrandTerms(brandTerms || 'pipedrive, pipe drive');
+      setBrandTerms(brandTerms || ',');
       setUseCustomRegex(useCustomRegex || false);
       setCustomRegex(customRegex || '');
       setCaseSensitive(caseSensitive || false);
